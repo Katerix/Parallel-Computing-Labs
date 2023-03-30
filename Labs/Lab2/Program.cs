@@ -7,20 +7,16 @@ public class Program
     static void Main(string[] ags) 
     {
         CustomThreadPool threadPool = new CustomThreadPool();
-        
-        while (true) 
-        {
-            if (!threadPool.taskQueue.Any())
-            {
-                Console.WriteLine("No more tasks in the queue. Let's add them again. \n");
+        TaskQueue mainQueue = new TaskQueue();
 
-                lock (threadPool.taskQueue)
-                {
-                    threadPool.FillQueue();
-                }
+        Thread queueManager = new Thread(() => mainQueue.StartQueue());
 
-                threadPool.InitThreads();
-            }
-        }
+        threadPool.InitThreads(mainQueue.taskQueue);
+
+        queueManager.Start();
+
+        //queueManager.Join();
+
+        threadPool.StartThreads();
     }
 }
