@@ -7,7 +7,7 @@ public class Program
     static void Main(string[] ags) 
     {
         CustomThreadPool threadPool = new CustomThreadPool();
-        TaskQueue mainQueue = new TaskQueue();
+        MyQueue mainQueue = new MyQueue();
 
         Thread queueManager = new Thread(() => mainQueue.StartQueue());
 

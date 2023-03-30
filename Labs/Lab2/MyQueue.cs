@@ -1,12 +1,12 @@
 ﻿
 namespace Lab2
 {
-    public class TaskQueue
+    public class MyQueue // concurrent
     {
         public Queue<Task> taskQueue;
         public int _queueTimeLimit;
 
-        public TaskQueue()
+        public MyQueue()
         {
             taskQueue = new Queue<Task>();
             _queueTimeLimit = 45;
@@ -27,18 +27,9 @@ namespace Lab2
                 taskQueue.Enqueue(new Task(() => Work(timeForCurrentTask)));
             }
         }
-
-        public static int GetRandomExecutionTime() => 6 + new Random().Next() % 6;
-
-        public void Work(int time)
-        {
-            Console.WriteLine($"{Thread.CurrentThread.Name} started to execute task ({time}s)...\n");
-
-            Thread.Sleep(time * 1000);
-
-            Console.WriteLine($"{Thread.CurrentThread.Name} finished task ({time}s) execution.\n");
-        }
-
+        // q put & get synchronized 
+        // wait notify - monitor
+        
         public void StartQueue()
         {
             while (true)
