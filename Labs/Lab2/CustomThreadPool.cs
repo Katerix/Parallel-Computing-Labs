@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace Lab2
 {
     public class CustomThreadPool
@@ -12,13 +7,11 @@ namespace Lab2
         public Queue<Task> taskQueue;
         public int _workingThreadAmount;
         public int _queueTimeLimit;
-        public int _taskCounter;
 
         public CustomThreadPool() 
         {
             _workingThreadAmount = 4;
             _queueTimeLimit = 45; // seconds
-            _taskCounter = 0;
             taskQueue = new Queue<Task>();
             workingThreads = new Thread[_workingThreadAmount];
             FillQueue();
@@ -37,9 +30,7 @@ namespace Lab2
 
                 if (summaryTime > 45) break;
 
-                _taskCounter++;
-
-                taskQueue.Enqueue(new Task(() => Work(timeForCurrentTask, _taskCounter)));
+                taskQueue.Enqueue(new Task(() => Work(timeForCurrentTask)));
             }
         }
 
@@ -74,7 +65,7 @@ namespace Lab2
 
         private static int GetRandomExecutionTime() => 6 + new Random().Next() % 6;
 
-        private void Work(int time, int count)
+        private void Work(int time)
         {
             Console.WriteLine($"{Thread.CurrentThread.Name} started to execute task ({time}s)...\n");
 
