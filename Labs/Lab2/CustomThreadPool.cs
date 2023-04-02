@@ -1,53 +1,35 @@
 ﻿
-using System.Collections;
-
 namespace Lab2
 {
     public class CustomThreadPool
     {
-        private Thread[] workingThreads;
-        
-        public int _workingThreadAmount;
+        public Thread[] workingThreads;
+        public readonly int _threadAmount;
 
-        public CustomThreadPool() 
+        public delegate void WorkerMethod();
+        public CustomThreadPool(int threadAmount)
         {
-            _workingThreadAmount = 4;
-            workingThreads = new Thread[_workingThreadAmount];
-            //InitThreads();
+            _threadAmount = threadAmount;
+
+            workingThreads = new Thread[_threadAmount];
         }
 
-        public void InitThreads(Queue<Task> taskQueue)
+        public void InitAndStart(WorkerMethod method)
         {
-            for (int i = 0; i < _workingThreadAmount; i++)
+            for (int i = 0; i < _threadAmount; i++)
             {
-                workingThreads[i] = new Thread(() =>
-                {
-                    while (true)
-                    {
-                        Task task;
-
-                        lock (taskQueue)
-                        {
-                            if (taskQueue.Count == 0) break;
-
-                            task = taskQueue.Dequeue();
-                        }
-
-                        task.RunSynchronously();
-                    }
-                });
-
+                workingThreads[i] = new Thread(() => method());
                 workingThreads[i].Name = $"Thread {i + 1}";
+                workingThreads[i].Start();
             }
         }
 
-        public void StartThreads()
+        public void Join()
         {
-            foreach (var thread in workingThreads)
-                thread.Start();
-
-            foreach (var thread in workingThreads)
-                thread.Join();
+            foreach (var thr in workingThreads)
+            { 
+                thr.Join();
+            }
         }
     }
 }
