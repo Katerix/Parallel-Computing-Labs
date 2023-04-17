@@ -13,6 +13,22 @@ namespace Lab3
             for (int i = 0; i < size; i++)
                 yield return rand.Next(range);
         }
+        public static int[] RandomInitUnique(int size)
+        {
+            List<int> numbers = new List<int>();
+            Random random = new Random();
+
+            while (numbers.Count < size)
+            {
+                int num = random.Next();
+                if (!numbers.Contains(num))
+                {
+                    numbers.Add(num);
+                }
+            }
+
+            return numbers.ToArray();
+        }
 
         public static (int, int) OddCountAndMaxSingleThread(this int[] numbers)
         {
@@ -29,7 +45,6 @@ namespace Lab3
 
             return (oddCount, oddMax);
         }
-
         public static (int, int) CountOddAndMaxParallelWithLock(this int[] numbers, int threadsAmount)
         {
             int size = numbers.Length;
@@ -53,7 +68,6 @@ namespace Lab3
 
             return (oddCount, oddMax);
         }
-
         private static void CountOddAndMaxSubmethod(int[] numbers, int start, int end, ref int oddCount, ref int oddMax)
         {
             for (int i = start; i < end; i++)
@@ -72,7 +86,6 @@ namespace Lab3
                 }
             }
         }
-
         public static (int, int) OddCountAndMaxParallelWithAtomic(this int[] numbers, int threadsAmount)
         {
             int oddCount = 0, oddMax = 0;
@@ -92,8 +105,6 @@ namespace Lab3
 
             return (oddCount, oddMax);
         }
-
-
         public static (int, int) OddCountAndMaxParallelLib(this IEnumerable<int> numbers)
         {
             var odds = numbers.AsParallel().Where(n => n % 2 != 0);
