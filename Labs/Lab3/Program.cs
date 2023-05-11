@@ -5,7 +5,7 @@ using System.Diagnostics;
 
 public static class Program
 {
-    public static int N = 10000000;
+    public static int N = 1000;
     public static int R = 100;
     public static int _threadAmount = 8;
 
@@ -15,7 +15,7 @@ public static class Program
     {
         Console.WriteLine($"Given an integer array (N = {N}). Count the amount of odd number and a max odd value.\n");
 
-        var numbers = Services.RandomInitUnique(N);
+        var numbers = Services.RandomInit(R, N).ToArray();
 
         Console.WriteLine("1. Single thread solution");
 

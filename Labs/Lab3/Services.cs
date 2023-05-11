@@ -96,9 +96,9 @@ namespace Lab3
                 {
                     Interlocked.Increment(ref oddCount);
 
-                    if (number > oddMax)
-                    {
-                        Interlocked.Exchange(ref oddMax, number);
+                    while (number > oddMax && Interlocked.CompareExchange(ref oddMax, number, oddMax) != number) 
+                    { 
+                        
                     }
                 }
             });
