@@ -41,6 +41,14 @@ namespace Lab1
                 yield return rand.Next(range);
         }
 
+        public static byte[] RandomInit(int size)
+        {
+            Random random = new Random();
+            byte[] randomBytes = new byte[size];
+            random.NextBytes(randomBytes);
+            return randomBytes;
+        }
+
         public static (int, double) GetModeAndMedianSingleThread(this int[] numbers, int range)
         {
             int[] frequences = new int[range + 1];

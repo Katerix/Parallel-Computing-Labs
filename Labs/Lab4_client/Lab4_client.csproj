@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Lab1\Lab1.csproj" />
+    <ProjectReference Include="..\Lab4_server\Lab4_server.csproj" />
   </ItemGroup>
 
 </Project>
