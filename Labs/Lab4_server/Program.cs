@@ -35,8 +35,9 @@ class Server
 
     public TcpClient AcceptClient()
     {
+        var client = _listener.AcceptTcpClient();
         Console.WriteLine($"Client {Thread.CurrentThread.Name} connected!\n");
-        return _listener.AcceptTcpClient();
+        return client;
     }
 
     static void Main(string[] args)
@@ -51,9 +52,8 @@ class Server
             var client = server.AcceptClient();
 
             Thread worker = new Thread(() => WorkerThread.HandleClient(client));
-            // worker.Name = $"{++numerator}";
+            worker.Name = $"{++numerator}";
             worker.Start();
-            worker.Join();
         }
     }
 }

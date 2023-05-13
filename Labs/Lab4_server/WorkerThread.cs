@@ -24,7 +24,7 @@ namespace Lab4_server
 
         public static string PerformCalculations(byte[] data)
         {
-            Console.WriteLine($"Server started the calculations for client {Thread.CurrentThread.Name}...\n");
+            Console.WriteLine($"Server started the calculations for client {Thread.CurrentThread.Name}...\n"); //no
             return Lab4_server.Services.Calculate(data, R);
         }
 
@@ -32,7 +32,7 @@ namespace Lab4_server
         {
             byte[] resultBytes = Encoding.ASCII.GetBytes(result);
             stream.Write(resultBytes, 0, resultBytes.Length);
-            Console.WriteLine($"Sent results to the client {Thread.CurrentThread.Name}.\n");
+            Console.WriteLine($"Sent results to the client {Thread.CurrentThread.Name}.\n"); //no
         }
 
         public static byte[] ReadInput(NetworkStream stream)
