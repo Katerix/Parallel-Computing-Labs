@@ -11,7 +11,7 @@ namespace Lab4_server
 
             var result = data.GetModeAndMedianSingleThread(range);
 
-            return $"{Thread.CurrentThread.Name}: Mode: {result.Item1}; Median: {result.Item2}";
+            return $"{Thread.CurrentThread.Name}: Mode: {result.Item1}; Median: {result.Item2}\n";
         }
 
         static int[] ConvertByteArrayToIntArray(byte[] byteArray)

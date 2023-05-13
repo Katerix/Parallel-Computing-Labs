@@ -24,7 +24,7 @@ namespace Lab4_server
 
         public static string PerformCalculations(byte[] data)
         {
-            Console.WriteLine($"Server started the calculations for client {Thread.CurrentThread.Name}...");
+            Console.WriteLine($"Server started the calculations for client {Thread.CurrentThread.Name}...\n");
             return Lab4_server.Services.Calculate(data, R);
         }
 

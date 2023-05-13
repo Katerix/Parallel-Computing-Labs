@@ -6,7 +6,7 @@ using Lab4_client;
 
 class Client
 {
-    const int N = 200;
+    const int N = 2000;
     const int R = 10;
 
     private readonly IPAddress _ipAddress = IPAddress.Parse("127.0.0.1");
@@ -23,15 +23,15 @@ class Client
         while (true)
         {
             TcpClient client = new TcpClient("localhost", _port);
-            Console.WriteLine($"Client {Thread.CurrentThread.Name} is connected to server!");
+            Console.WriteLine($"Client {Thread.CurrentThread.Name} is connected to server!\n");
 
             var data = Lab1.Services.RandomInit(R, N).ToArray();
             var inputBuffer = ClientService.ConvertIntArrayToByteArray(data);
 
             NetworkStream stream = client.GetStream();
             stream.Write(inputBuffer, 0, inputBuffer.Length);
-            ClientService.PrintArray(data);
-            Console.WriteLine("Input data sent!");
+            // ClientService.PrintArray(data);
+            Console.WriteLine("Input data sent!\n");
 
 
             byte[] outputBuffer = new byte[1024];

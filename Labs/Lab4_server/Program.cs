@@ -24,18 +24,18 @@ class Server
     public void Start()
     {
         _listener.Start();
-        Console.WriteLine("Server is started and ready to receive calls...");
+        Console.WriteLine("Server is started and ready to receive calls...\n");
     }
 
     public void ShutDown()
     { 
         _listener.Stop();
-        Console.WriteLine("Server is shut down.");
+        Console.WriteLine("Server is shut down.\n");
     }
 
     public TcpClient AcceptClient()
     {
-        Console.WriteLine($"Client {Thread.CurrentThread.Name} connected!");
+        Console.WriteLine($"Client {Thread.CurrentThread.Name} connected!\n");
         return _listener.AcceptTcpClient();
     }
 
@@ -51,7 +51,7 @@ class Server
             var client = server.AcceptClient();
 
             Thread worker = new Thread(() => WorkerThread.HandleClient(client));
-            worker.Name = $"{++numerator}";
+            // worker.Name = $"{++numerator}";
             worker.Start();
             worker.Join();
         }
