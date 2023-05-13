@@ -42,10 +42,10 @@ class Server
     public void ReleaseClient(TcpClient client)
     {
         client.Close();
-        Console.WriteLine("Client disconnected from server");
+        Console.WriteLine("Client disconnected from server. \n");
     }
 
-    public (int, double) PerformCalculations(byte[] data)
+    public string PerformCalculations(byte[] data)
     {
         Console.WriteLine("Server started the calculations...");
         return Lab4_server.Services.Calculate(data, R);
@@ -65,9 +65,11 @@ class Server
             NetworkStream stream = client.GetStream();
             stream.Read(data, 0, data.Length);
 
-            server.PerformCalculations(data);
+            var result = server.PerformCalculations(data);
 
-            server.ReleaseClient(client);
+            byte[] resultBytes = Encoding.ASCII.GetBytes(result);
+            stream.Write(resultBytes, 0, resultBytes.Length);
+            Console.WriteLine("Sent results to the client.");
         }
     }
 }

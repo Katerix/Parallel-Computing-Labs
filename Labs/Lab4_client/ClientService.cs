@@ -27,5 +27,11 @@ namespace Lab4_client
 
             return byteArray;
         }
+
+        public static void PrintArray(int[] array)
+        { 
+            foreach (int i in array) Console.Write($"{i} ");
+            Console.WriteLine();
+        }
     }
 }

@@ -19,20 +19,23 @@ class Client
             TcpClient client = new TcpClient("localhost", port);
             Console.WriteLine("Connected to server!");
 
-            var message = ClientService.ConvertIntArrayToByteArray(Lab1.Services.RandomInit(R, N).ToArray());
+            var data = Lab1.Services.RandomInit(R, N).ToArray();
+            var inputBuffer = ClientService.ConvertIntArrayToByteArray(data);
 
             NetworkStream stream = client.GetStream();
-            stream.Write(message, 0, message.Length);
-            Console.WriteLine("Message sent!");
+            stream.Write(inputBuffer, 0, inputBuffer.Length);
+            ClientService.PrintArray(data);
+            Console.WriteLine("Input data sent!");
 
-            stream = client.GetStream();
-            stream.Read(message, 0, message.Length);
 
-            Console.WriteLine(Encoding.ASCII.GetString(message));
+            byte[] outputBuffer = new byte[1024];
+            int bytesRead = stream.Read(outputBuffer, 0, outputBuffer.Length);
+            string resultString = Encoding.ASCII.GetString(outputBuffer, 0, bytesRead);
+
+            Console.WriteLine($"Received: {resultString}");
             client.Close();
 
-            Console.WriteLine("Disconnected from server.");
-
+            Console.WriteLine("Disconnected from server.\n");
         }
     }
 }

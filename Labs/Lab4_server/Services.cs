@@ -5,15 +5,13 @@ namespace Lab4_server
 {
     public static class Services
     {
-        public static (int, double) Calculate(byte[] buffer, int range)
+        public static string Calculate(byte[] buffer, int range)
         {
             var data = ConvertByteArrayToIntArray(buffer);
 
             var result = data.GetModeAndMedianSingleThread(range);
 
-            Console.WriteLine($"Mode: {result.Item1}; Median: {result.Item2}");
-
-            return result;
+            return $"Mode: {result.Item1}; Median: {result.Item2}";
         }
 
         static int[] ConvertByteArrayToIntArray(byte[] byteArray)
