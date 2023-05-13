@@ -2,7 +2,6 @@
 using Lab4_server;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 
 class Server
 {
@@ -11,14 +10,15 @@ class Server
 
     public readonly TcpListener _listener;
 
-    const int N = 200;
-    const int R = 10;
+    public bool IsActive { get; set; }
 
     public Server()
     {
         _ipAddress = IPAddress.Parse("127.0.0.1");
         _port = 6666;
         _listener = new TcpListener(_ipAddress, _port);
+
+        IsActive = true;
     }
 
     public void Start()
@@ -35,20 +35,8 @@ class Server
 
     public TcpClient AcceptClient()
     {
-        Console.WriteLine("Client connected!");
+        Console.WriteLine($"Client {Thread.CurrentThread.Name} connected!");
         return _listener.AcceptTcpClient();
-    }
-
-    public void ReleaseClient(TcpClient client)
-    {
-        client.Close();
-        Console.WriteLine("Client disconnected from server. \n");
-    }
-
-    public string PerformCalculations(byte[] data)
-    {
-        Console.WriteLine("Server started the calculations...");
-        return Lab4_server.Services.Calculate(data, R);
     }
 
     static void Main(string[] args)
@@ -56,20 +44,16 @@ class Server
         Server server = new Server();
         server.Start();
 
-        while (true)
+        int numerator = 0;
+
+        while (server.IsActive)
         {
             var client = server.AcceptClient();
 
-            byte[] data = new byte[N];
-
-            NetworkStream stream = client.GetStream();
-            stream.Read(data, 0, data.Length);
-
-            var result = server.PerformCalculations(data);
-
-            byte[] resultBytes = Encoding.ASCII.GetBytes(result);
-            stream.Write(resultBytes, 0, resultBytes.Length);
-            Console.WriteLine("Sent results to the client.");
+            Thread worker = new Thread(() => WorkerThread.HandleClient(client));
+            worker.Name = $"{++numerator}";
+            worker.Start();
+            worker.Join();
         }
     }
 }
