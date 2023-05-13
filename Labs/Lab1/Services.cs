@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace Lab1
 {
     public static class Services
@@ -39,14 +34,6 @@ namespace Lab1
 
             for (int i = 0; i < size; i++)
                 yield return rand.Next(range);
-        }
-
-        public static byte[] RandomInit(int size)
-        {
-            Random random = new Random();
-            byte[] randomBytes = new byte[size];
-            random.NextBytes(randomBytes);
-            return randomBytes;
         }
 
         public static (int, double) GetModeAndMedianSingleThread(this int[] numbers, int range)
