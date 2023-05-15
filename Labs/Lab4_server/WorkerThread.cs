@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Sockets;
+﻿using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -19,12 +16,42 @@ namespace Lab4_server
 
             WriteToStream(client, stream, "connected");
 
-            stream = client.GetStream();
-            var input = ReadInput(client, stream);
+            byte[] inputArray; string message;
 
-            var result = PerformCalculations(input);
+            while (true)
+            {
+                inputArray = ReadInput(client, stream);
+                var testVariable = Encoding.ASCII.GetString(inputArray, 0, 15);
 
-            SendResults(client, stream, result);
+                if (int.TryParse(testVariable, out _))
+                {
+                    WriteToStream(client, stream, "received data");
+                    break;
+                }
+            }
+
+            while (true)
+            {
+                message = ReadFromStream(client, stream);
+
+                if (message.Contains("start calculation"))
+                {
+                    var calculationThread = Task.Run(() => PerformCalculations(inputArray));
+
+                    while (!calculationThread.IsCompleted)
+                    {
+                        message = ReadFromStream(client, stream);
+
+                        if (message != null && message.Contains("get status"))
+                        {
+                            WriteToStream(client, stream, "in progress");
+                        }
+                    }
+
+                    SendResults(client, stream, calculationThread.Result);
+                    break;
+                }
+            }
         }
 
         public static string PerformCalculations(byte[] data)
@@ -53,7 +80,7 @@ namespace Lab4_server
         public static string ReadFromStream(TcpClient client, NetworkStream stream)
         {
             stream = client.GetStream();
-            byte[] data = new byte[N];
+            byte[] data = new byte[20];
             stream.Read(data, 0, data.Length);
             return Encoding.ASCII.GetString(data);
         }

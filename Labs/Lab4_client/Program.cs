@@ -39,7 +39,7 @@ class Client
 
                 if (resultString.Contains("connected"))
                 {
-                    Console.WriteLine($"{name} is connected to server!\n");
+                    Console.WriteLine($"{name} is connected to server!!!\n");
                     break;
                 }
             }
