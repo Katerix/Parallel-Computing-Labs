@@ -15,6 +15,7 @@ namespace Lab4_server
             NetworkStream stream = client.GetStream();
 
             WriteToStream(client, stream, "connected");
+            Console.WriteLine("Connected");
 
             byte[] inputArray; string message;
 
@@ -36,6 +37,8 @@ namespace Lab4_server
 
                 if (message.Contains("start calculation"))
                 {
+                    Console.WriteLine("Starting calculation...");
+
                     var calculationThread = Task.Run(() => PerformCalculations(inputArray));
 
                     while (!calculationThread.IsCompleted)

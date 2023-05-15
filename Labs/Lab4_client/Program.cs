@@ -107,7 +107,7 @@ class Client
 
     static void Main(string[] args)
     {
-        Client[] clients = new Client[4];
+        /*Client[] clients = new Client[4];
 
         for (int i = 0; i < 4; i++)
         {
@@ -128,6 +128,9 @@ class Client
         foreach (var thr in threads)
         {
             thr.Join();
-        }
+        }*/
+
+        Client client = new Client();
+        client.ClientMethod();
     }
 }
