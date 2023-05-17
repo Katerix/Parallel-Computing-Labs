@@ -51,7 +51,6 @@ class Server
             var client = server.AcceptClient();
 
             Thread worker = new Thread(() => WorkerThread.HandleClient(client));
-            worker.Name = $"{++numerator}";
             worker.Start();
         }
     }

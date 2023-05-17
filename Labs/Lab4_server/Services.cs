@@ -9,7 +9,7 @@ namespace Lab4_server
         {
             var data = ConvertByteArrayToIntArray(buffer);
 
-            var result = data.GetModeAndMedianSingleThread(range);
+            var result = data.GetModeAndMedianParallel(range, threadAmount);
 
             return $"results => Mode: {result.Item1}; Median: {result.Item2};\n";
         }

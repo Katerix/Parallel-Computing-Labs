@@ -12,7 +12,7 @@ namespace Lab4_server
             NetworkStream stream = client.GetStream();
 
             WriteToStream(client, stream, "connected");
-            Console.WriteLine("Connected \n");
+            Console.WriteLine("Client connected \n");
 
             byte[] inputArray; string message;
             
@@ -50,8 +50,9 @@ namespace Lab4_server
 
                         else break;
                     }
-
+                    
                     SendResults(client, stream, calculationResults);
+                    Console.WriteLine("Finished and sent results!\n");
 
                     break;
                 }

@@ -12,6 +12,8 @@ class Client
     const int R = 10; // range
     const int THREAD_AMOUNT = 4;
 
+    public int Index { get; set; } = 0;
+
     private int CONFIG_SIZE = 6 + THREAD_AMOUNT.ToString().Length + N.ToString().Length + R.ToString().Length;
 
     public readonly int _port = 6666;
@@ -23,13 +25,13 @@ class Client
 
     public void ClientMethod()
     {
-        var name = $"Client {Thread.CurrentThread.ManagedThreadId}";
-
         while (true)
         {
             TcpClient client = new TcpClient("127.0.0.1", _port);
 
             NetworkStream stream = client.GetStream();
+
+            var name = $"Client {++Index}";
 
             byte[] outputBuffer; int bytesRead; string resultString;
 
@@ -116,6 +118,11 @@ class Client
                 if (resultString.Contains("results"))
                 { 
                     break;
+                }
+                else
+                {
+                    Console.WriteLine($"Server response: {resultString}\n");
+                    Thread.Sleep(100);
                 }
             }
 
