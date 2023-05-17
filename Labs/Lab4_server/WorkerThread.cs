@@ -1,6 +1,5 @@
 ﻿using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Lab4_server
 {
@@ -13,20 +12,19 @@ namespace Lab4_server
             NetworkStream stream = client.GetStream();
 
             WriteToStream(client, stream, "connected");
-            Console.WriteLine("Connected");
+            Console.WriteLine("Connected \n");
 
             byte[] inputArray; string message;
-
             
-            inputArray = ReadInput(client, stream);
-            var testVariable = Encoding.ASCII.GetString(inputArray, 0, 15);
+            var сonfiguration = ReadFromStream(client, stream);
 
-            if (int.TryParse(testVariable, out _))
-            {
-                WriteToStream(client, stream, "received data");
-                Console.WriteLine("Received array");
-            }
-            
+            GetConfigs(сonfiguration ?? string.Empty, out N, out R, out threadAmount);
+
+            WriteToStream(client, stream, "received configs");
+
+            inputArray = ReadInput(client, stream, N);
+
+            WriteToStream(client, stream, "received data");
 
             while (true)
             {
@@ -34,30 +32,92 @@ namespace Lab4_server
 
                 if (message.Contains("start calculation"))
                 {
-                    Console.WriteLine("Starting calculation...");
+                    Console.WriteLine("Starting calculation... \n");
 
-                    var calculationThread = Task.Run(() => PerformCalculations(inputArray, R, threadAmount));
+                    string calculationResults = string.Empty;
 
-                    while (!calculationThread.IsCompleted)
+                    var calculationThread = new Thread(() => PerformCalculations(inputArray, R, threadAmount, out calculationResults));
+                    calculationThread.Start();
+
+                    while (calculationResults == string.Empty)
                     {
                         message = ReadFromStream(client, stream);
 
-                        if (message != null && message.Contains("get status"))
+                        if (message.Contains("get status"))
                         {
                             WriteToStream(client, stream, "in progress");
                         }
+
+                        else break;
                     }
 
-                    SendResults(client, stream, calculationThread.Result);
+                    SendResults(client, stream, calculationResults);
+
                     break;
                 }
             }
         }
 
-        public static string PerformCalculations(byte[] data, int range, int threadAmount)
+        public static void GetConfigs(string configurations, out int N, out int R, out int threadAmount)
         {
-            // Console.WriteLine($"Server started the calculations for client {Thread.CurrentThread.Name}...\n"); //no
-            return Lab4_server.Services.Calculate(data, range, threadAmount);
+            int i = 0; string tempStringForNumber = string.Empty;
+
+            if (configurations[i] == 'T')
+            {
+                i += 2;
+
+                while (configurations[i] != 'N')
+                {
+                    tempStringForNumber += configurations[i++];
+                }
+
+                threadAmount = Parse(tempStringForNumber);
+                
+                if (configurations[i] == 'N')
+                {
+                    i += 2; tempStringForNumber = string.Empty;
+
+                    while (configurations[i] != 'R')
+                    {
+                        tempStringForNumber += configurations[i++];
+                    }
+
+                    N = Parse(tempStringForNumber);
+
+                    if (configurations[i] == 'R')
+                    {
+                        i += 2; tempStringForNumber = string.Empty;
+
+                        while (i < configurations.Length)
+                        {
+                            tempStringForNumber += configurations[i++];
+                        }
+
+                        R = Parse(tempStringForNumber);
+
+                        return;
+                    }
+                }
+            }
+
+            throw new Exception("BAD DATA");
+        }
+
+        private static int Parse(string tempStringForNumber)
+        {
+            try
+            {
+                return int.Parse(tempStringForNumber);
+            }
+            catch (Exception)
+            {
+                throw new Exception("BAD DATA");
+            }
+        }
+
+        public static void PerformCalculations(byte[] data, int range, int threadAmount, out string results)
+        {
+            results = Lab4_server.Services.Calculate(data, range, threadAmount);
         }
 
         public static void SendResults(TcpClient client, NetworkStream stream, string result)
@@ -65,13 +125,12 @@ namespace Lab4_server
             stream = client.GetStream();
             byte[] resultBytes = Encoding.ASCII.GetBytes(result);
             stream.Write(resultBytes, 0, resultBytes.Length);
-            // Console.WriteLine($"Sent results to the client {Thread.CurrentThread.Name}.\n"); //no
         }
 
-        public static byte[] ReadInput(TcpClient client, NetworkStream stream)
+        public static byte[] ReadInput(TcpClient client, NetworkStream stream, int N)
         {
             stream = client.GetStream();
-            byte[] data = new byte[N];
+            byte[] data = new byte[4 * N];
             stream.Read(data, 0, data.Length);
 
             return data;

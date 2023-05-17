@@ -36,7 +36,6 @@ class Server
     public TcpClient AcceptClient()
     {
         var client = _listener.AcceptTcpClient();
-        // Console.WriteLine($"Client {Thread.CurrentThread.Name} connected!\n");
         return client;
     }
 

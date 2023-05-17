@@ -9,9 +9,9 @@ namespace Lab4_server
         {
             var data = ConvertByteArrayToIntArray(buffer);
 
-            var result = data.GetModeAndMedianParallel(range, threadAmount);
+            var result = data.GetModeAndMedianSingleThread(range);
 
-            return $"{Thread.CurrentThread.Name} results: Mode: {result.Item1}; Median: {result.Item2}\n";
+            return $"results => Mode: {result.Item1}; Median: {result.Item2};\n";
         }
          
         static int[] ConvertByteArrayToIntArray(byte[] byteArray)

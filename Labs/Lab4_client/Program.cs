@@ -12,7 +12,7 @@ class Client
     const int R = 10; // range
     const int THREAD_AMOUNT = 4;
 
-    const int CONFIG_SIZE = 4 * (THREAD_AMOUNT + N + R);
+    private int CONFIG_SIZE = 6 + THREAD_AMOUNT.ToString().Length + N.ToString().Length + R.ToString().Length;
 
     public readonly int _port = 6666;
 
@@ -23,7 +23,7 @@ class Client
 
     public void ClientMethod()
     {
-        var name = $"Client {Thread.CurrentThread.Name}";
+        var name = $"Client {Thread.CurrentThread.ManagedThreadId}";
 
         while (true)
         {
@@ -36,6 +36,7 @@ class Client
             while (true)
             {
                 // check if server is ready
+
                 outputBuffer = new byte[9];
                 bytesRead = stream.Read(outputBuffer, 0, outputBuffer.Length);
                 resultString = Encoding.ASCII.GetString(outputBuffer, 0, bytesRead);
@@ -47,21 +48,43 @@ class Client
                 }
             }
 
+            // prepare configurations
+
+            string config = $"T={THREAD_AMOUNT}N={N}R={R}";
+
+            stream = client.GetStream();
+            stream.Write(Encoding.ASCII.GetBytes(config), 0, CONFIG_SIZE);
+            
+            Console.WriteLine($"{name} sent configurations!\n");
+
+            // check if server received configs
+
+            while (true)
+            {
+                outputBuffer = new byte[16];
+                bytesRead = stream.Read(outputBuffer, 0, outputBuffer.Length);
+                resultString = Encoding.ASCII.GetString(outputBuffer, 0, bytesRead);
+
+                if (resultString.Contains("received configs"))
+                {
+                    Console.WriteLine($"{name}: server received configurations and ready to except data.\n");
+                    break;
+                }
+            }
+
             // prepare data
-            string config = $"{THREAD_AMOUNT}{N}{R}";
+
             var data = Lab1.Services.RandomInit(R, N).ToArray();
             var inputBuffer = ClientService.ConvertIntArrayToByteArray(data);
 
             stream = client.GetStream();
-            stream.Write(Encoding.ASCII.GetBytes(config), 0, CONFIG_SIZE);
-            stream.Write(inputBuffer, CONFIG_SIZE, inputBuffer.Length);
-            
-            Console.WriteLine($"{name} sent configurations and input data!\n");
+            stream.Write(inputBuffer, 0, inputBuffer.Length);
 
-            //check if server received data
+            // check if server received data
+
             while (true)
             {
-                outputBuffer = new byte[N];
+                outputBuffer = new byte[4 * N];
                 bytesRead = stream.Read(outputBuffer, 0, outputBuffer.Length);
                 resultString = Encoding.ASCII.GetString(outputBuffer, 0, bytesRead);
 
@@ -72,15 +95,21 @@ class Client
                 }
             }
 
-            //ping server to start
+            // ping server to start
+
             var message = Encoding.ASCII.GetBytes("start calculation");
             stream = client.GetStream();
             stream.Write(message, 0, message.Length);
 
             while (true)
             {
-                //get status
-                outputBuffer = new byte[1024];
+                // get status
+
+                message = Encoding.ASCII.GetBytes("get status");
+                stream = client.GetStream();
+                stream.Write(message, 0, message.Length);
+
+                outputBuffer = new byte[50];
                 bytesRead = stream.Read(outputBuffer, 0, outputBuffer.Length);
                 resultString = Encoding.ASCII.GetString(outputBuffer, 0, bytesRead);
 
@@ -88,24 +117,20 @@ class Client
                 { 
                     break;
                 }
-
-                Thread.Sleep(1000);
-
-                message = Encoding.ASCII.GetBytes("get status");
-                stream = client.GetStream();
-                stream.Write(message, 0, message.Length);
             }
 
             Console.WriteLine($"{name} received: {resultString}");
-            client.Close();
 
-            //ping server thst results received
+            // ping server thst results received
+
             message = Encoding.ASCII.GetBytes("received");
             stream = client.GetStream();
             stream.Write(message, 0, message.Length);
 
             Console.WriteLine($"{name} disconnected from server.\n");
             client.Close();
+
+            Thread.Sleep(2000);
         }
     }
 
