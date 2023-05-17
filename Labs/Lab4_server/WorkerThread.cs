@@ -6,12 +6,10 @@ namespace Lab4_server
 {
     public static class WorkerThread
     {
-        const int N = 200;
-        const int R = 10;
-
-
         public static void HandleClient(TcpClient client)
         {
+            int N, R, threadAmount;
+
             NetworkStream stream = client.GetStream();
 
             WriteToStream(client, stream, "connected");
@@ -19,17 +17,16 @@ namespace Lab4_server
 
             byte[] inputArray; string message;
 
-            while (true)
-            {
-                inputArray = ReadInput(client, stream);
-                var testVariable = Encoding.ASCII.GetString(inputArray, 0, 15);
+            
+            inputArray = ReadInput(client, stream);
+            var testVariable = Encoding.ASCII.GetString(inputArray, 0, 15);
 
-                if (int.TryParse(testVariable, out _))
-                {
-                    WriteToStream(client, stream, "received data");
-                    break;
-                }
+            if (int.TryParse(testVariable, out _))
+            {
+                WriteToStream(client, stream, "received data");
+                Console.WriteLine("Received array");
             }
+            
 
             while (true)
             {
@@ -39,7 +36,7 @@ namespace Lab4_server
                 {
                     Console.WriteLine("Starting calculation...");
 
-                    var calculationThread = Task.Run(() => PerformCalculations(inputArray));
+                    var calculationThread = Task.Run(() => PerformCalculations(inputArray, R, threadAmount));
 
                     while (!calculationThread.IsCompleted)
                     {
@@ -57,10 +54,10 @@ namespace Lab4_server
             }
         }
 
-        public static string PerformCalculations(byte[] data)
+        public static string PerformCalculations(byte[] data, int range, int threadAmount)
         {
-            Console.WriteLine($"Server started the calculations for client {Thread.CurrentThread.Name}...\n"); //no
-            return Lab4_server.Services.Calculate(data, R);
+            // Console.WriteLine($"Server started the calculations for client {Thread.CurrentThread.Name}...\n"); //no
+            return Lab4_server.Services.Calculate(data, range, threadAmount);
         }
 
         public static void SendResults(TcpClient client, NetworkStream stream, string result)
@@ -68,7 +65,7 @@ namespace Lab4_server
             stream = client.GetStream();
             byte[] resultBytes = Encoding.ASCII.GetBytes(result);
             stream.Write(resultBytes, 0, resultBytes.Length);
-            Console.WriteLine($"Sent results to the client {Thread.CurrentThread.Name}.\n"); //no
+            // Console.WriteLine($"Sent results to the client {Thread.CurrentThread.Name}.\n"); //no
         }
 
         public static byte[] ReadInput(TcpClient client, NetworkStream stream)

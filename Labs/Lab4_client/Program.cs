@@ -8,8 +8,11 @@ using System.Xml.Linq;
 
 class Client
 {
-    const int N = 10000;
-    const int R = 10;
+    const int N = 10000; // array size
+    const int R = 10; // range
+    const int THREAD_AMOUNT = 4;
+
+    const int CONFIG_SIZE = 4 * (THREAD_AMOUNT + N + R);
 
     public readonly int _port = 6666;
 
@@ -45,18 +48,20 @@ class Client
             }
 
             // prepare data
+            string config = $"{THREAD_AMOUNT}{N}{R}";
             var data = Lab1.Services.RandomInit(R, N).ToArray();
             var inputBuffer = ClientService.ConvertIntArrayToByteArray(data);
 
             stream = client.GetStream();
-            stream.Write(inputBuffer, 0, inputBuffer.Length);
+            stream.Write(Encoding.ASCII.GetBytes(config), 0, CONFIG_SIZE);
+            stream.Write(inputBuffer, CONFIG_SIZE, inputBuffer.Length);
             
-            Console.WriteLine($"{name} sent input data!\n");
+            Console.WriteLine($"{name} sent configurations and input data!\n");
 
             //check if server received data
             while (true)
             {
-                outputBuffer = new byte[256];
+                outputBuffer = new byte[N];
                 bytesRead = stream.Read(outputBuffer, 0, outputBuffer.Length);
                 resultString = Encoding.ASCII.GetString(outputBuffer, 0, bytesRead);
 
@@ -66,7 +71,6 @@ class Client
                     break;
                 }
             }
-            
 
             //ping server to start
             var message = Encoding.ASCII.GetBytes("start calculation");
