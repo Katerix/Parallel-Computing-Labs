@@ -5,7 +5,7 @@ namespace Lab4_server
 {
     public static class WorkerThread
     {
-        public static void HandleClient(TcpClient client)
+        public static async Task HandleClient(TcpClient client)
         {
             int N, R, threadAmount;
 
@@ -34,12 +34,14 @@ namespace Lab4_server
                 {
                     Console.WriteLine("Starting calculation... \n");
 
-                    string calculationResults = string.Empty;
+                    Task<string> calculationTask = Task.Run(() =>
+                    {
+                        string calculationResults = string.Empty;
+                        PerformCalculations(inputArray, R, threadAmount, out calculationResults);
+                        return calculationResults;
+                    });
 
-                    var calculationThread = new Thread(() => PerformCalculations(inputArray, R, threadAmount, out calculationResults));
-                    calculationThread.Start();
-
-                    while (calculationResults == string.Empty)
+                    while (!calculationTask.IsCompleted)
                     {
                         message = ReadFromStream(client, stream);
 
@@ -47,11 +49,10 @@ namespace Lab4_server
                         {
                             WriteToStream(client, stream, "in progress");
                         }
-
-                        else break;
                     }
-                    
-                    SendResults(client, stream, calculationResults);
+
+                    string results = await calculationTask;
+                    SendResults(client, stream, results);
                     Console.WriteLine("Finished and sent results!\n");
 
                     break;
